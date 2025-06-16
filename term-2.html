@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-black">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#00ff41">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Backlog Reactor">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkJhY2tsb2cgUmVhY3RvciIsCiAgInNob3J0X25hbWUiOiAiUmVhY3RvciIsCiAgImRlc2NyaXB0aW9uIjogIkdhbWUgQmFja2xvZyBUcmFja2VyIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwMDAwMDAiLAogICJ0aGVtZV9jb2xvciI6ICIjMDBmZjQxIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M00zUnZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQXlORGdnTWpRNElpQjNhV1IwYUQwaU1qUTRJaUJvWldsbmFIUTlJakkwT0NJK1BHUmxabk0rUEd4cGJtVmhja2R5WVdScFpXNTBJR2xrUFNKbmNtRmthV1Z1ZENJK1BITjBiM0JuYjJac2MyVjBQU0l3SURFME1TSWdiMlptYzJWMFBTSXhNRGsySWk4K1BITjBiM0JuYjJac2MyVjBQU0l4SWlCdlptWnpaWFE5SWpnNElpOCtQQzlzYVc1bFlYSkhjbUZrYVdWdWRENCtQQzlrWldaelBqeHlaV04wSUhkcFpIUm9QU0l5TkRnaUlHaGxhV2RvZEQwaU1qUTRJaUJtYVd4c1BTSjFjbXdvSTJkeVlXUnBaVzUwS1NJdlBqd3ZjM1puUGc9PSIsCiAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiLAogICAgICAic2l6ZXMiOiAiYW55IgogICAgfQogIF0KfQ==">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&family=Orbitron:wght@400;700;900&display=swap');
+
+    :root {
+      --terminal-green: #00ff41;
+      --terminal-green-dim: #00cc33;
+      --terminal-green-dark: #008822;
+      --terminal-amber: #ffb000;
+      --terminal-red: #ff0040;
+      --terminal-blue: #0080ff;
+      --bg-dark: #000000;
+      --bg-scanline: rgba(0, 255, 65, 0.03);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background-color: var(--bg-dark);
+      color: var(--terminal-green);
+      overflow-x: hidden;
+      image-rendering: pixelated;
+      text-rendering: optimizeSpeed;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-top: env(safe-area-inset-top);
+    }
+
+    /* Mobile-optimized CRT Monitor Effect */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background:
+              linear-gradient(transparent 50%, var(--bg-scanline) 50%),
+              radial-gradient(circle at center, transparent 0%, rgba(0, 255, 65, 0.1) 100%);
+      background-size: 100% 6px, 100% 100%;
+      pointer-events: none;
+      z-index: 1000;
+      animation: scanlines 0.15s linear infinite;
+    }
+
+    @keyframes scanlines {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 6px; }
+    }
+
+    /* Mobile-optimized Terminal Flicker */
+    @keyframes flicker {
+      0%, 95%, 100% { opacity: 1; }
+      96%, 99% { opacity: 0.9; }
+    }
+
+    .terminal-container {
+      animation: flicker 4s infinite;
+      padding: 15px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Typography */
+    .terminal-text {
+      font-family: 'Share Tech Mono', monospace;
+      text-shadow: 0 0 5px currentColor;
+      letter-spacing: 0.1em;
+    }
+
+    .terminal-header {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px currentColor;
+      letter-spacing: 0.2em;
+    }
+
+    /* Mobile-optimized Terminal Window */
+    .terminal-window {
+      background: linear-gradient(135deg, rgba(0, 20, 0, 0.95) 0%, rgba(0, 10, 0, 0.98) 100%);
+      border: 2px solid var(--terminal-green);
+      border-radius: 8px;
+      box-shadow:
+              inset 0 0 20px rgba(0, 255, 65, 0.2),
+              0 0 20px rgba(0, 255, 65, 0.3),
+              0 0 40px rgba(0, 255, 65, 0.1);
+      position: relative;
+    }
+
+    .terminal-window::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+              repeating-linear-gradient(
+                      90deg,
+                      transparent,
+                      transparent 2px,
+                      rgba(0, 255, 65, 0.03) 2px,
+                      rgba(0, 255, 65, 0.03) 4px
+              );
+      pointer-events: none;
+      border-radius: 6px;
+    }
+
+    /* Mobile-optimized Buttons */
+    .terminal-btn {
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid var(--terminal-green);
+      color: var(--terminal-green);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 14px;
+      padding: 12px 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .terminal-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .terminal-btn:active {
+      background: rgba(0, 255, 65, 0.2);
+      transform: scale(0.98);
+    }
+
+    .terminal-btn:active::before {
+      left: 100%;
+    }
+
+    /* Status Colors */
+    .status-active { color: var(--terminal-green); }
+    .status-warning { color: var(--terminal-amber); }
+    .status-error { color: var(--terminal-red); }
+    .status-info { color: var(--terminal-blue); }
+
+    .btn-danger {
+      border-color: var(--terminal-red);
+      color: var(--terminal-red);
+    }
+    .btn-danger:active {
+      background: rgba(255, 0, 64, 0.2);
+    }
+
+    .btn-warning {
+      border-color: var(--terminal-amber);
+      color: var(--terminal-amber);
+    }
+    .btn-warning:active {
+      background: rgba(255, 176, 0, 0.2);
+    }
+
+    .btn-info {
+      border-color: var(--terminal-blue);
+      color: var(--terminal-blue);
+    }
+    .btn-info:active {
+      background: rgba(0, 128, 255, 0.2);
+    }
+
+    /* Mobile-optimized Input Fields */
+    .terminal-input {
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid var(--terminal-green-dark);
+      color: var(--terminal-green);
+      font-family: 'Share Tech Mono', monospace;
+      padding: 12px 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      width: 100%;
+      border-radius: 6px;
+      font-size: 16px; /* Prevents zoom on iOS */
+      min-height: 48px;
+    }
+
+    .terminal-input:focus {
+      outline: none;
+      border-color: var(--terminal-green);
+      box-shadow:
+              inset 0 0 10px rgba(0, 255, 65, 0.2),
+              0 0 5px rgba(0, 255, 65, 0.5);
+      background: rgba(0, 20, 0, 0.8);
+    }
+
+    .terminal-input::placeholder {
+      color: var(--terminal-green-dark);
+      opacity: 0.7;
+    }
+
+    /* Progress Bars */
+    .progress-container {
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid var(--terminal-green-dark);
+      height: 24px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: repeating-linear-gradient(
+              90deg,
+              var(--terminal-green) 0px,
+              var(--terminal-green) 10px,
+              var(--terminal-green-dim) 10px,
+              var(--terminal-green-dim) 20px
+      );
+      box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.5);
+      transition: width 0.3s ease;
+      position: relative;
+      border-radius: 3px;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: progress-scan 2s infinite;
+    }
+
+    @keyframes progress-scan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* ASCII Art Styling */
+    .ascii-art {
+      font-family: 'Share Tech Mono', monospace;
+      line-height: 1;
+      white-space: pre;
+      color: var(--terminal-green-dim);
+    }
+
+    /* Blinking Cursor */
+    .cursor {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* Mobile-optimized Terminal Lists */
+    .terminal-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .terminal-list-item {
+      padding: 16px;
+      border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+    }
+
+    .terminal-list-item:active {
+      background: rgba(0, 255, 65, 0.1);
+      transform: scale(0.98);
+    }
+
+    .terminal-list-item:active::before {
+      content: '>';
+      position: absolute;
+      left: 8px;
+      color: var(--terminal-green);
+      animation: blink 0.5s infinite;
+    }
+
+    /* Mobile Modal */
+    .terminal-modal {
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(2px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(0, 30, 0, 0.95) 0%, rgba(0, 15, 0, 0.98) 100%);
+      border: 2px solid var(--terminal-green);
+      box-shadow:
+              inset 0 0 30px rgba(0, 255, 65, 0.2),
+              0 0 30px rgba(0, 255, 65, 0.3);
+      border-radius: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 2px solid var(--terminal-green);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 255, 65, 0.05);
+    }
+
+    .modal-body {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-list {
+      flex: 1;
+      overflow-y: auto;
+      border: 2px solid var(--terminal-green-dark);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.5);
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .modal-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Mobile Scrollbar */
+    .scrollable {
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .scrollable::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Status Indicators */
+    .status-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .status-dot.active {
+      background: var(--terminal-green);
+      box-shadow: 0 0 10px var(--terminal-green);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.inactive {
+      background: var(--terminal-green-dark);
+    }
+
+    .status-dot.warning {
+      background: var(--terminal-amber);
+      box-shadow: 0 0 10px var(--terminal-amber);
+      animation: pulse 1s infinite;
+    }
+
+    .status-dot.error {
+      background: var(--terminal-red);
+      box-shadow: 0 0 10px var(--terminal-red);
+      animation: pulse 0.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Mobile Notification */
+    .mobile-notification {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(0, 30, 0, 0.95) 0%, rgba(0, 15, 0, 0.98) 100%);
+      border: 2px solid var(--terminal-green);
+      border-radius: 8px;
+      padding: 16px;
+      z-index: 3000;
+      text-align: center;
+      transform: translateY(-100px);
+      transition: transform 0.3s ease;
+      box-shadow:
+              inset 0 0 10px rgba(0, 255, 65, 0.2),
+              0 0 15px rgba(0, 255, 65, 0.3);
+    }
+
+    .mobile-notification.show {
+      transform: translateY(0);
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--terminal-green);
+      color: black;
+      border: 2px solid var(--terminal-green);
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0, 255, 65, 0.4);
+      z-index: 1500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .fab:active {
+      transform: scale(0.9);
+    }
+
+    /* Mobile Grid Layouts */
+    .mobile-grid {
+      display: grid;
+      gap: 15px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 80px;
+      gap: 12px;
+      align-items: end;
+    }
+
+    /* Prevent double-tap zoom */
+    .no-zoom {
+      touch-action: manipulation;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .terminal-header {
+        font-size: 1.5rem;
+        letter-spacing: 0.1em;
+      }
+
+      .terminal-btn {
+        font-size: 12px;
+        padding: 10px 16px;
+      }
+
+      .terminal-window {
+        border-width: 2px;
+      }
+
+      .terminal-container {
+        padding: 10px;
+        gap: 12px;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      .terminal-header {
+        font-size: 1.2rem;
+      }
+
+      .terminal-container {
+        padding: 8px;
+        gap: 10px;
+      }
+
+      .terminal-btn {
+        padding: 8px 14px;
+        min-height: 40px;
+      }
+    }
+
+    /* Safe area support */
+    @supports (padding: max(0px)) {
+      .terminal-container {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+      }
+
+      .mobile-notification {
+        top: max(20px, env(safe-area-inset-top));
+        left: max(20px, env(safe-area-inset-left));
+        right: max(20px, env(safe-area-inset-right));
+      }
+
+      .fab {
+        bottom: max(30px, env(safe-area-inset-bottom));
+        right: max(30px, env(safe-area-inset-right));
+      }
+    }
+  </style>
+</head>
+<body class="bg-black text-green-400 no-zoom">
+
+<div class="terminal-container">
+  <!-- Terminal Header -->
+  <div class="terminal-window p-4">
+    <div class="text-center">
+      <div class="terminal-header text-xl md:text-2xl mb-2">
+        ROBCO INDUSTRIES (TM) TERMLINK PROTOCOL
+      </div>
+      <div class="terminal-text text-sm mb-2">
+        ENTER PASSWORD NOW
+      </div>
+      <div class="terminal-text text-xs opacity-70">
+        &gt; BACKLOG_REACTOR.EXE
+      </div>
+      <div class="terminal-text text-xs opacity-50 mt-2">
+        WELCOME TO PROJECT: BACKLOG REACTOR
+      </div>
+      <div class="terminal-text text-xs opacity-50">
+        FACILITY: VAULT-TEC_SHIN_KAWASAKI | SYNC: <span id="lastSyncTime">LOADING...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Processing Chamber -->
+  <div class="terminal-window p-4">
+    <div class="flex items-center mb-4">
+      <div class="status-dot inactive" id="statusDot"></div>
+      <div class="terminal-text text-base">
+        [PROCESSING_CHAMBER_01]
+        <span class="text-sm ml-2" id="processingStatus">OFFLINE</span>
+      </div>
+    </div>
+
+    <div id="idleState" class="text-center py-6">
+      <div class="ascii-art text-3xl mb-4">
+        ___
+        [___]
+        ) (
+        /   \
+        /     \
+        /       \
+      </div>
+      <div class="terminal-text mb-2">&gt;&gt; REACTOR CHAMBER IDLE &lt;&lt;</div>
+      <div class="terminal-text text-sm opacity-70 mb-4">
+        SELECT ENTERTAINMENT ISOTOPE FOR PROCESSING
+      </div>
+      <button class="terminal-btn w-full" onclick="reactorApp.showGameLibrary()">
+        &gt; ACCESS_ISOTOPE_LIBRARY
+      </button>
+    </div>
+
+    <div id="activeState" class="hidden">
+      <div class="mb-4">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-black border border-green-500 flex items-center justify-center text-2xl mr-3 rounded">
+            <span id="gameIcon">⚡</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="terminal-text font-bold text-sm truncate" id="currentGameTitle">-</div>
+            <div class="terminal-text text-xs opacity-70" id="currentGameClass">-</div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="terminal-text text-xs">SESSION_PROGRESS:</span>
+              <span class="terminal-text text-xs" id="sessionProgress">0.0H</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar" style="width: 0%" id="sessionProgressBar"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between mb-1">
+              <span class="terminal-text text-xs">COMPLETION_RATE:</span>
+              <span class="terminal-text text-xs" id="overallProgress">0%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar" style="width: 0%" id="overallProgressBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="terminal-window p-3 mb-4">
+        <div class="terminal-text text-xs mb-2 status-active">SESSION_DATA:</div>
+        <div class="grid grid-cols-2 gap-4 text-xs">
+          <div>
+            <div class="opacity-70 mb-1">DURATION:</div>
+            <div class="terminal-text text-sm" id="sessionDuration">00:00:00</div>
+          </div>
+          <div>
+            <div class="opacity-70 mb-1">REMAINING:</div>
+            <div class="terminal-text text-sm" id="estimatedRemaining">--:--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-grid">
+        <button class="terminal-btn btn-warning" id="pauseBtn" onclick="reactorApp.pauseSession()">PAUSE</button>
+        <button class="terminal-btn" id="stopBtn" onclick="reactorApp.stopSession(true)">COMPLETE</button>
+        <button class="terminal-btn btn-danger" id="resetBtn" onclick="reactorApp.resetCurrentGame()">RESET</button>
+        <button class="terminal-btn" id="resumeBtn" onclick="reactorApp.resumeSession()" style="display: none;">RESUME</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Status -->
+  <div class="terminal-window p-4">
+    <div class="terminal-text mb-4">[SYSTEM_STATUS]</div>
+    <div class="stats-grid text-center">
+      <div class="terminal-window p-3">
+        <div class="terminal-text text-xl status-info" id="statTotalGames">0</div>
+        <div class="terminal-text text-xs opacity-70">ISOTOPES</div>
+      </div>
+      <div class="terminal-window p-3">
+        <div class="terminal-text text-xl status-active" id="statCompleted">0</div>
+        <div class="terminal-text text-xs opacity-70">PROCESSED</div>
+      </div>
+      <div class="terminal-window p-3">
+        <div class="terminal-text text-xl status-warning" id="statHours">0.0</div>
+        <div class="terminal-text text-xs opacity-70">HOURS</div>
+      </div>
+      <div class="terminal-window p-3">
+        <div class="terminal-text text-xl status-active" id="statEfficiency">0%</div>
+        <div class="terminal-text text-xs opacity-70">EFFICIENCY</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Processing Queue -->
+  <div class="terminal-window p-4">
+    <div class="terminal-text mb-4">[PROCESSING_QUEUE]</div>
+    <div class="max-h-60 scrollable">
+      <ul class="terminal-list" id="queueList">
+        <li class="text-center py-8 opacity-50">
+          <div class="ascii-art text-2xl mb-2">
+            [ ]
+            [ ]
+            [ ]
+          </div>
+          <div class="terminal-text text-xs">QUEUE_EMPTY</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Add Isotope -->
+  <div class="terminal-window p-4">
+    <div class="terminal-text mb-4">[ADD_ISOTOPE]</div>
+    <div class="space-y-3">
+      <input type="text" id="gameNameInput" class="terminal-input text-sm" placeholder="ENTER_ISOTOPE_NAME">
+      <div class="input-grid">
+        <select id="gameClass" class="terminal-input text-sm">
+          <option value="A">CLASS_A</option>
+          <option value="B">CLASS_B</option>
+          <option value="C">CLASS_C</option>
+          <option value="D">CLASS_D</option>
+          <option value="E">CLASS_E</option>
+        </select>
+        <input type="number" id="estimatedHours" class="terminal-input text-sm" placeholder="HOURS">
+      </div>
+      <button class="terminal-btn w-full" onclick="reactorApp.addGameToLibrary()">
+        &gt; ADD_TO_LIBRARY
+      </button>
+    </div>
+  </div>
+
+  <!-- Completed Processing -->
+  <div class="terminal-window p-4">
+    <div class="terminal-text mb-4">[COMPLETED_PROCESSING]</div>
+    <div class="max-h-48 scrollable">
+      <ul class="terminal-list" id="completedList">
+        <li class="text-center py-8 opacity-50">
+          <div class="ascii-art text-xl mb-2">
+            🏆
+          </div>
+          <div class="terminal-text text-xs">NO_COMPLETED_ISOTOPES</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Action Button -->
+<button class="fab" onclick="reactorApp.showGameLibrary()">
+  📚
+</button>
+
+<!-- Mobile Modal -->
+<div id="gameLibraryModal" class="hidden terminal-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="terminal-text">[ISOTOPE_LIBRARY_ACCESS]</div>
+      <button id="closeLibraryBtn" class="terminal-btn" style="padding: 8px 12px; min-height: auto;">&gt; CLOSE</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="librarySearch" class="terminal-input text-sm mb-4" placeholder="SEARCH_ISOTOPES...">
+      <div class="modal-list">
+        <ul class="terminal-list" id="libraryContent">
+          <!-- Library content goes here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Notifications -->
+<div id="notification-container"></div>
+
+<script>
+  class BacklogReactor {
+    constructor() {
+      this.gameLibrary = [];
+      this.currentSession = null;
+      this.completedGames = [];
+      this.stats = { totalHours: 0 };
+      this.sessionTimer = null;
+      this.init();
+    }
+
+    init() {
+      this.loadData();
+      this.updateUI();
+      this.setupEventListeners();
+      this.registerServiceWorker();
+      setInterval(() => this.updateTimeAndTimers(), 1000);
+      setInterval(() => this.saveData(), 15000);
+    }
+
+    async registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        try {
+          const swCode = `
+            const CACHE_NAME = 'backlog-reactor-v1';
+            const urlsToCache = ['/'];
+
+            self.addEventListener('install', event => {
+              event.waitUntil(
+                caches.open(CACHE_NAME)
+                  .then(cache => cache.addAll(urlsToCache))
+              );
+            });
+
+            self.addEventListener('fetch', event => {
+              event.respondWith(
+                caches.match(event.request)
+                  .then(response => response || fetch(event.request))
+              );
+            });
+          `;
+
+          const blob = new Blob([swCode], { type: 'application/javascript' });
+          const swUrl = URL.createObjectURL(blob);
+          await navigator.serviceWorker.register(swUrl);
+          console.log('Service Worker registered');
+        } catch (error) {
+          console.log('Service Worker registration failed:', error);
+        }
+      }
+    }
+
+    setupEventListeners() {
+      document.getElementById('gameNameInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.addGameToLibrary();
+        }
+      });
+      document.getElementById('closeLibraryBtn').addEventListener('click', () => this.hideGameLibrary());
+      document.getElementById('librarySearch').addEventListener('input', e => this.filterLibrary(e.target.value));
+
+      // Mobile-specific event listeners
+      document.getElementById('gameLibraryModal').addEventListener('click', (e) => {
+        if (e.target.id === 'gameLibraryModal') this.hideGameLibrary();
+      });
+
+      // Prevent zoom on double tap
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+
+      // Handle back button on Android
+      window.addEventListener('popstate', () => {
+        if (!document.getElementById('gameLibraryModal').classList.contains('hidden')) {
+          this.hideGameLibrary();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !document.getElementById('gameLibraryModal').classList.contains('hidden')) {
+          this.hideGameLibrary();
+        }
+      });
+    }
+
+    loadData() {
+      const library = localStorage.getItem('reactorGameLibrary');
+      const session = localStorage.getItem('reactorCurrentSession');
+      const completed = localStorage.getItem('reactorCompletedGames');
+      const stats = localStorage.getItem('reactorGameStats');
+
+      if (library) {
+        this.gameLibrary = JSON.parse(library);
+      } else {
+        this.populateInitialData();
+      }
+
+      if (session) this.currentSession = JSON.parse(session);
+      if (completed) this.completedGames = JSON.parse(completed);
+      if (stats) this.stats = JSON.parse(stats);
+    }
+
+    populateInitialData() {
+      const initialIsotopes = [
+        { id: "INSIDE-LIMBO-001", class: "A", hours: 8 }, { id: "UNRAVEL-002", class: "A", hours: 8 },
+        { id: "BLACKSAD-001", class: "A", hours: 12 }, { id: "RANDOM-001", class: "A", hours: 12 },
+        { id: "DMC5-SPECIAL-001", class: "B", hours: 25 }, { id: "ROBOCOP-MURPHY-001", class: "B", hours: 20 },
+        { id: "MORTAL-SHELL-001", class: "B", hours: 18 }, { id: "MAD-MAX-001", class: "B", hours: 20 },
+        { id: "ACECOM7-001", class: "B", hours: 20 }, { id: "GRAVEL-001", class: "B", hours: 5 },
+        { id: "BIOSHOCK-COLLECTION-001", class: "C", hours: 35 }, { id: "HOLMES-CHAPTER1-001", class: "C", hours: 25 },
+        { id: "HOLMES-AWAKENED-001", class: "C", hours: 20 }, { id: "DETECTIVE-BUNDLE-001", class: "C", hours: 25 },
+        { id: "AD-INFINITUM-001", class: "C", hours: 15 }, { id: "V-RALLY4-001", class: "C", hours: 2 },
+        { id: "WITCHER3-COMPLETE-001", class: "D", hours: 100 }, { id: "RDR2-ULTIMATE-001", class: "D", hours: 80 },
+        { id: "MGS5-COMPLETE-001", class: "D", hours: 60 }, { id: "MAFIA-TRILOGY-001", class: "D", hours: 50 },
+        { id: "FARCRY3-001", class: "E", hours: 25 }, { id: "JUSTCAUSE4-001", class: "E", hours: 25 },
+        { id: "MAFIA3-001", class: "E", hours: 25 }, { id: "AC-ORIGINS-001", class: "E", hours: 60 },
+        { id: "BATTLEFIELD5-001", class: "E", hours: 20 }, { id: "FORZA-MAP-001", class: "E", hours: 0 }
+      ];
+      this.gameLibrary = initialIsotopes.map(iso => ({
+        id: Date.now() + Math.random(), name: iso.id, estimatedHours: iso.hours, class: iso.class,
+        status: 'unprocessed', totalHours: 0, sessions: [], dateAdded: new Date().toISOString(), completion: 0
+      }));
+    }
+
+    saveData() {
+      localStorage.setItem('reactorGameLibrary', JSON.stringify(this.gameLibrary));
+      localStorage.setItem('reactorCurrentSession', JSON.stringify(this.currentSession));
+      localStorage.setItem('reactorCompletedGames', JSON.stringify(this.completedGames));
+      localStorage.setItem('reactorGameStats', JSON.stringify(this.stats));
+      document.getElementById('lastSyncTime').textContent = new Date().toTimeString().split(' ')[0];
+    }
+
+    addGameToLibrary() {
+      const nameInput = document.getElementById('gameNameInput');
+      const hoursInput = document.getElementById('estimatedHours');
+      const classSelect = document.getElementById('gameClass');
+
+      if (!nameInput.value.trim()) {
+        this.showNotification('ERROR: ISOTOPE_NAME_REQUIRED', 'error');
+        return;
+      }
+
+      if (this.gameLibrary.find(g => g.name.toLowerCase() === nameInput.value.trim().toLowerCase())) {
+        this.showNotification('ERROR: ISOTOPE_ALREADY_EXISTS', 'error');
+        return;
+      }
+
+      const game = {
+        id: Date.now(),
+        name: nameInput.value.trim().toUpperCase(),
+        estimatedHours: parseInt(hoursInput.value) || 20,
+        class: classSelect.value,
+        status: 'unprocessed',
+        totalHours: 0,
+        sessions: [],
+        dateAdded: new Date().toISOString(),
+        completion: 0
+      };
+
+      this.gameLibrary.push(game);
+      nameInput.value = '';
+      hoursInput.value = '';
+      this.saveData();
+      this.updateUI();
+      this.showNotification(`SUCCESS: ISOTOPE_ADDED: ${game.name}`, 'success');
+
+      // Haptic feedback if available
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+    }
+
+    startProcessing(gameId) {
+      if (this.currentSession) {
+        this.stopSession(false);
+      }
+
+      const game = this.gameLibrary.find(g => g.id === gameId);
+      if (!game) return;
+
+      this.currentSession = {
+        gameId: game.id,
+        gameName: game.name,
+        gameClass: game.class,
+        estimatedHours: game.estimatedHours,
+        startTime: new Date().toISOString(),
+        isPaused: false,
+        pausedTime: 0,
+        totalPausedTime: 0
+      };
+
+      this.hideGameLibrary();
+      this.saveData();
+      this.updateUI();
+      this.showNotification(`PROCESSING_INITIATED: ${game.name}`, 'info');
+
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 50, 50]);
+      }
+    }
+
+    pauseSession() {
+      if (!this.currentSession || this.currentSession.isPaused) return;
+
+      this.currentSession.isPaused = true;
+      this.currentSession.pausedTime = Date.now();
+      this.saveData();
+      this.updateUI();
+      this.showNotification('SESSION_PAUSED', 'warning');
+
+      if (navigator.vibrate) {
+        navigator.vibrate(100);
+      }
+    }
+
+    resumeSession() {
+      if (!this.currentSession || !this.currentSession.isPaused) return;
+
+      this.currentSession.totalPausedTime += Date.now() - this.currentSession.pausedTime;
+      this.currentSession.isPaused = false;
+      this.saveData();
+      this.updateUI();
+      this.showNotification('SESSION_RESUMED', 'success');
+
+      if (navigator.vibrate) {
+        navigator.vibrate([50, 50, 50]);
+      }
+    }
+
+    stopSession(completed = true) {
+      if (!this.currentSession) return;
+
+      const sessionDurationMs = (Date.now() - new Date(this.currentSession.startTime).getTime()) - this.currentSession.totalPausedTime;
+      const sessionHours = sessionDurationMs / 3600000;
+      const game = this.gameLibrary.find(g => g.id === this.currentSession.gameId);
+
+      if (game) {
+        game.totalHours += sessionHours;
+        game.sessions.push({ date: this.currentSession.startTime, duration: sessionHours });
+        game.completion = Math.min((game.totalHours / game.estimatedHours) * 100, 100);
+
+        if (completed) {
+          game.status = 'completed';
+          this.completedGames.push({
+            ...game,
+            finalHours: game.totalHours,
+            completedDate: new Date().toISOString()
+          });
+          this.showNotification(`PROCESSING_COMPLETE: ${game.name}`, 'success');
+
+          // Celebration haptic
+          if (navigator.vibrate) {
+            navigator.vibrate([100, 50, 100, 50, 100]);
+          }
+        } else {
+          this.showNotification(`SESSION_TERMINATED: ${game.name}`, 'info');
+        }
+      }
+
+      this.stats.totalHours += sessionHours;
+      this.currentSession = null;
+      this.saveData();
+      this.updateUI();
+    }
+
+    resetCurrentGame() {
+      if (!this.currentSession) return;
+
+      const gameName = this.currentSession.gameName;
+      if (confirm(`CONFIRM: RESET_ALL_PROGRESS FOR "${gameName}"? THIS_ACTION_CANNOT_BE_UNDONE.`)) {
+        const game = this.gameLibrary.find(g => g.id === this.currentSession.gameId);
+        if (game) {
+          this.stats.totalHours -= game.totalHours;
+          if (this.stats.totalHours < 0) this.stats.totalHours = 0;
+          game.totalHours = 0;
+          game.sessions = [];
+          game.status = 'unprocessed';
+          game.completion = 0;
+          this.completedGames = this.completedGames.filter(g => g.id !== game.id);
+          this.showNotification(`PROGRESS_RESET: ${gameName}`, 'info');
+        }
+        this.currentSession = null;
+        this.saveData();
+        this.updateUI();
+      }
+    }
+
+    updateUI() {
+      this.updateActiveSessionDisplay();
+      this.updateQueue();
+      this.updateCompletedGames();
+      this.updateStats();
+    }
+
+    updateActiveSessionDisplay() {
+      const idleState = document.getElementById('idleState');
+      const activeState = document.getElementById('activeState');
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('processingStatus');
+
+      if (!this.currentSession) {
+        idleState.style.display = 'block';
+        activeState.style.display = 'none';
+        statusDot.className = 'status-dot inactive';
+        statusText.textContent = 'OFFLINE';
+        return;
+      }
+
+      idleState.style.display = 'none';
+      activeState.style.display = 'block';
+      const { isPaused, gameName, gameClass } = this.currentSession;
+
+      statusDot.className = isPaused ? 'status-dot warning' : 'status-dot active';
+      statusText.textContent = isPaused ? 'PAUSED' : 'PROCESSING';
+
+      document.getElementById('pauseBtn').style.display = isPaused ? 'none' : 'block';
+      document.getElementById('resumeBtn').style.display = isPaused ? 'block' : 'none';
+
+      document.getElementById('currentGameTitle').textContent = gameName;
+      document.getElementById('currentGameClass').textContent = `CLASS_${gameClass}`;
+    }
+
+    updateTimeAndTimers() {
+      document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
+
+      if (this.currentSession && !this.currentSession.isPaused) {
+        const elapsedMs = (Date.now() - new Date(this.currentSession.startTime).getTime()) - this.currentSession.totalPausedTime;
+        const elapsedHours = elapsedMs / 3600000;
+        const game = this.gameLibrary.find(g => g.id === this.currentSession.gameId);
+        if (!game) return;
+
+        const remainingHours = Math.max(game.estimatedHours - (game.totalHours + elapsedHours), 0);
+        const toHHMMSS = (ms) => new Date(ms).toISOString().substr(11, 8);
+
+        document.getElementById('sessionDuration').textContent = toHHMMSS(elapsedMs);
+        document.getElementById('estimatedRemaining').textContent = `${Math.floor(remainingHours)}H ${Math.floor((remainingHours % 1) * 60)}M`;
+
+        const totalHoursSoFar = game.totalHours + elapsedHours;
+        const overallCompletion = Math.min((totalHoursSoFar / game.estimatedHours) * 100, 100);
+
+        document.getElementById('overallProgressBar').style.width = `${overallCompletion}%`;
+        document.getElementById('overallProgress').textContent = `${overallCompletion.toFixed(1)}%`;
+        document.getElementById('sessionProgress').textContent = `${elapsedHours.toFixed(1)}H`;
+      }
+    }
+
+    updateQueue() {
+      const queueList = document.getElementById('queueList');
+      const unprocessed = this.gameLibrary.filter(g =>
+              g.status === 'unprocessed' &&
+              (!this.currentSession || g.id !== this.currentSession.gameId)
+      );
+
+      if (unprocessed.length === 0) {
+        queueList.innerHTML = `
+                <li class="text-center py-8 opacity-50">
+                    <div class="ascii-art text-2xl mb-2">
+[ ]
+[ ]
+[ ]
+                    </div>
+                    <div class="terminal-text text-xs">QUEUE_EMPTY</div>
+                </li>
+            `;
+        return;
+      }
+
+      queueList.innerHTML = unprocessed.slice(0, 5).map(g => `
+            <li class="terminal-list-item cursor-pointer" onclick="reactorApp.startProcessing(${g.id})">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex-1 min-w-0">
+                        <div class="terminal-text text-sm truncate">${g.name}</div>
+                        <div class="terminal-text text-xs opacity-70">CLASS_${g.class} | ${g.completion.toFixed(0)}% | ${g.estimatedHours}H</div>
+                    </div>
+                    <div class="terminal-text text-xs status-active ml-2">READY</div>
+                </div>
+            </li>
+        `).join('');
+    }
+
+    updateCompletedGames() {
+      const completedList = document.getElementById('completedList');
+      if (!completedList) return;
+
+      if (this.completedGames.length === 0) {
+        completedList.innerHTML = `
+                <li class="text-center py-8 opacity-50">
+                    <div class="ascii-art text-xl mb-2">🏆</div>
+                    <div class="terminal-text text-xs">NO_COMPLETED_ISOTOPES</div>
+                </li>
+            `;
+        return;
+      }
+
+      completedList.innerHTML = this.completedGames.slice().reverse().slice(0, 3).map(g => `
+            <li class="terminal-list-item">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex-1 min-w-0">
+                        <div class="terminal-text text-sm status-active truncate">${g.name}</div>
+                        <div class="terminal-text text-xs opacity-70">${new Date(g.completedDate).toLocaleDateString()}</div>
+                    </div>
+                    <div class="terminal-text text-xs status-active ml-2">${g.finalHours.toFixed(1)}H</div>
+                </div>
+            </li>
+        `).join('');
+    }
+
+    updateStats() {
+      const efficiency = this.gameLibrary.length > 0 ? (this.completedGames.length / this.gameLibrary.length) * 100 : 0;
+      document.getElementById('statTotalGames').textContent = this.gameLibrary.length;
+      document.getElementById('statCompleted').textContent = this.completedGames.length;
+      document.getElementById('statHours').textContent = this.stats.totalHours.toFixed(1);
+      document.getElementById('statEfficiency').textContent = `${efficiency.toFixed(0)}%`;
+    }
+
+    showGameLibrary() {
+      document.getElementById('gameLibraryModal').classList.remove('hidden');
+      this.updateLibraryModal();
+      // Push state for Android back button
+      history.pushState({ modal: 'library' }, '', '');
+      setTimeout(() => document.getElementById('librarySearch').focus(), 300);
+    }
+
+    hideGameLibrary() {
+      document.getElementById('gameLibraryModal').classList.add('hidden');
+      // Handle back button state
+      if (history.state && history.state.modal === 'library') {
+        history.back();
+      }
+    }
+
+    updateLibraryModal() {
+      const content = document.getElementById('libraryContent');
+      if (this.gameLibrary.length === 0) {
+        content.innerHTML = `
+                <li class="text-center py-8 opacity-50">
+                    <div class="ascii-art text-2xl mb-2">
+  [ ]
+ [   ]
+[     ]
+                    </div>
+                    <div class="terminal-text text-xs">LIBRARY_EMPTY</div>
+                </li>
+            `;
+        return;
+      }
+
+      content.innerHTML = this.gameLibrary.map(g => `
+            <li class="terminal-list-item cursor-pointer" onclick="reactorApp.startProcessing(${g.id})">
+                <div class="flex justify-between items-center w-full">
+                    <div class="flex-1 min-w-0">
+                        <div class="terminal-text truncate">${g.name}</div>
+                        <div class="terminal-text text-xs opacity-70">
+                            CLASS_${g.class} | ${g.estimatedHours}H | ${g.completion.toFixed(0)}% COMPLETE
+                        </div>
+                    </div>
+                    <div class="terminal-text text-xs ${g.status === 'completed' ? 'status-active' : 'status-info'} ml-2">
+                        ${g.status.toUpperCase()}
+                    </div>
+                </div>
+            </li>
+        `).join('');
+    }
+
+    filterLibrary(query) {
+      const items = document.querySelectorAll('#libraryContent .terminal-list-item');
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query.toLowerCase()) ? 'flex' : 'none';
+      });
+    }
+
+    showNotification(message, type = 'info') {
+      // Remove any existing notifications
+      const existing = document.querySelector('.mobile-notification');
+      if (existing) {
+        existing.remove();
+      }
+
+      const container = document.getElementById('notification-container');
+      const notif = document.createElement('div');
+
+      const colors = {
+        success: 'var(--terminal-green)',
+        error: 'var(--terminal-red)',
+        warning: 'var(--terminal-amber)',
+        info: 'var(--terminal-blue)'
+      };
+
+      notif.className = 'mobile-notification terminal-text';
+      notif.style.color = colors[type] || colors.info;
+      notif.style.borderColor = colors[type] || colors.info;
+      notif.textContent = `> ${message}`;
+
+      container.appendChild(notif);
+
+      // Show notification
+      setTimeout(() => notif.classList.add('show'), 100);
+
+      // Hide notification
+      setTimeout(() => {
+        notif.classList.remove('show');
+        setTimeout(() => notif.remove(), 300);
+      }, 3000);
+    }
+  }
+
+  let reactorApp;
+  document.addEventListener('DOMContentLoaded', () => {
+    reactorApp = new BacklogReactor();
+  });
+
+  // PWA Install prompt
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('PWA install prompt available');
+  });
+</script>
+
+</body>
+</html>
